@@ -1,0 +1,41 @@
+﻿using ShenzhenIO.Emulator.Core.Execution;
+using ShenzhenIO.Emulator.Core.IO;
+
+namespace ShenzhenIO.Emulator.Implementation.Execution
+{
+    public class AddCommand : ICommand
+    {
+        private readonly IRegister _accumulator;
+        private readonly IReadable _valueSource;
+
+        private int? _value;
+
+        public AddCommand(IRegister accumulator, IReadable valueSource)
+        {
+            _accumulator = accumulator;
+            _valueSource = valueSource;
+        }
+
+        public CommandExecutionResult Execute()
+        {
+            if (_value == null)
+            {
+                if (!_valueSource.TryRead(out var value))
+                {
+                    return CommandExecutionResult.Blocked();
+                }
+
+                _value = value;
+            }
+
+            var accumulatorValue = _accumulator.Read();
+            var sum = accumulatorValue + _value.Value;
+
+            _accumulator.Write(sum);
+
+            _value = null;
+
+            return CommandExecutionResult.Finished();
+        }
+    }
+}
