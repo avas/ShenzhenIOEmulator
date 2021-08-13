@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using Moq;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
-using ShenzhenIO.Emulator.Core.Language;
 using ShenzhenIO.Emulator.Implementation.Language;
-using System.Collections.Generic;
 using Xunit;
 
 namespace ShenzhenIO.Emulator.Tests.Language

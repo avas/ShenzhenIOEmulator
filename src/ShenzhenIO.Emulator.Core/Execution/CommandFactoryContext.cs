@@ -1,7 +1,7 @@
-﻿using ShenzhenIO.Emulator.Core.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ShenzhenIO.Emulator.Core.IO;
 
-namespace ShenzhenIO.Emulator.Core.Language
+namespace ShenzhenIO.Emulator.Core.Execution
 {
     public class CommandFactoryContext
     {
