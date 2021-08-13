@@ -1,6 +1,6 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
-using System;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
 {
@@ -15,9 +15,9 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public DstCommand(IRegister accumulator, IReadable digitNumberSource, IReadable digitValueSource)
         {
-            _accumulator = accumulator;
-            _digitNumberSource = digitNumberSource;
-            _digitValueSource = digitValueSource;
+            _accumulator = accumulator ?? throw new ArgumentNullException(nameof(accumulator));
+            _digitNumberSource = digitNumberSource ?? throw new ArgumentNullException(nameof(digitNumberSource));
+            _digitValueSource = digitValueSource ?? throw new ArgumentNullException(nameof(digitValueSource));
         }
 
         public CommandExecutionResult Execute()

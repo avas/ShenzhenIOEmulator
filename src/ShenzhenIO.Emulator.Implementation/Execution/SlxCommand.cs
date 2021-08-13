@@ -1,4 +1,5 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
@@ -9,7 +10,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public SlxCommand(IXBusPort targetPort)
         {
-            _targetPort = targetPort;
+            _targetPort = targetPort ?? throw new ArgumentNullException(nameof(targetPort));
         }
 
         public CommandExecutionResult Execute()

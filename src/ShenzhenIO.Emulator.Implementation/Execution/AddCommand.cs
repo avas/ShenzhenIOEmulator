@@ -1,4 +1,5 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
@@ -12,8 +13,8 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public AddCommand(IRegister accumulator, IReadable valueSource)
         {
-            _accumulator = accumulator;
-            _valueSource = valueSource;
+            _accumulator = accumulator ?? throw new ArgumentNullException(nameof(accumulator));
+            _valueSource = valueSource ?? throw new ArgumentNullException(nameof(valueSource));
         }
 
         public CommandExecutionResult Execute()

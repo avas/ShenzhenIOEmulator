@@ -1,4 +1,5 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
@@ -17,9 +18,9 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public GenCommand(IAnalogPort outputPort, IReadable highPulseDurationSource, IReadable lowPulseDurationSource)
         {
-            _outputPort = outputPort;
-            _highPulseDurationSource = highPulseDurationSource;
-            _lowPulseDurationSource = lowPulseDurationSource;
+            _outputPort = outputPort ?? throw new ArgumentNullException(nameof(outputPort));
+            _highPulseDurationSource = highPulseDurationSource ?? throw new ArgumentNullException(nameof(highPulseDurationSource));
+            _lowPulseDurationSource = lowPulseDurationSource ?? throw new ArgumentNullException(nameof(lowPulseDurationSource));
 
             _highPulseDuration = null;
             _lowPulseDuration = null;

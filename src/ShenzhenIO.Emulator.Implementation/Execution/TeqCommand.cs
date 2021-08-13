@@ -1,4 +1,5 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
@@ -13,8 +14,8 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public TeqCommand(IReadable firstValueSource, IReadable secondValueSource)
         {
-            _firstValueSource = firstValueSource;
-            _secondValueSource = secondValueSource;
+            _firstValueSource = firstValueSource ?? throw new ArgumentNullException(nameof(firstValueSource));
+            _secondValueSource = secondValueSource ?? throw new ArgumentNullException(nameof(secondValueSource));
 
             _firstValue = null;
             _secondValue = null;

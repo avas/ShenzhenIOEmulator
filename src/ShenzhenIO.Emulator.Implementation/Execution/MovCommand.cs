@@ -1,4 +1,5 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
@@ -12,8 +13,8 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public MovCommand(IReadable source, IWritable target)
         {
-            _source = source;
-            _target = target;
+            _source = source ?? throw new ArgumentNullException(nameof(source));
+            _target = target ?? throw new ArgumentNullException(nameof(target));
 
             _readValue = null;
         }
