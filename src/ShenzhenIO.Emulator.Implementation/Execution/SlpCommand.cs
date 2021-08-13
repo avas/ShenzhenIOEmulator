@@ -1,6 +1,6 @@
-﻿using ShenzhenIO.Emulator.Core.Execution;
+﻿using System;
+using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
-using System;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
 {
@@ -20,41 +20,33 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
         public CommandExecutionResult Execute()
         {
-            CommandExecutionResult result = null;
-
             // If this command does not currently sleep...
             if (_remainingTimeUnitsToSleep == null)
             {
-                if (_valueSource.TryRead(out var sleepAmount))
+                if (!_valueSource.TryRead(out var sleepAmount))
                 {
-                    // ...and the sleep amount is available, prepare for pending sleep.
-                    _remainingTimeUnitsToSleep = sleepAmount;
+                    // ...and the sleep amount is not yet available, block the device until the value will be available.
+                    return CommandExecutionResult.Blocked();
                 }
-                else
-                {
-                    // Otherwise, if the sleep is not available, block the device until the value will become available.
-                    result = CommandExecutionResult.Blocked();
-                }
+
+                // Otherwise, read the value and store it for later use.
+                _remainingTimeUnitsToSleep = sleepAmount;
             }
 
-            if (result == null && _remainingTimeUnitsToSleep > 0)
+            if (_remainingTimeUnitsToSleep > 0)
             {
                 // Otherwise, if the device is currently sleeping, and the sleep did not finish -
                 // put the device into the sleep state and wait for the time to pass.
 
-                result = CommandExecutionResult.Sleeping(this);
+                return CommandExecutionResult.Sleeping(this);
             }
 
-            if (result == null && _remainingTimeUnitsToSleep <= 0)
-            {
-                // Otherwise, if the sleep is finished (or if there was no need to even start it) -
-                // finish the command and reset its state.
+            // Otherwise, if the sleep is finished (or if there was no need to even start it) -
+            // finish the command and reset its state.
 
-                _remainingTimeUnitsToSleep = null;
-                result = CommandExecutionResult.Finished();
-            }
+            _remainingTimeUnitsToSleep = null;
 
-            return result;
+            return CommandExecutionResult.Finished();
         }
 
         public void HandleSleep(int timeUnitsCount)
