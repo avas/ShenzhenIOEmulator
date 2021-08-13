@@ -5,7 +5,7 @@
         public bool IsFinished { get; set; }
 
         public DeviceState NextDeviceState { get; set; }
-        public TestResult TestResult { get; set; }
+        public TestResult? TestResult { get; set; }
         public string NextDestination { get; set; }
 
         public ISleepHandler SleepHandler { get; set; }

@@ -95,7 +95,7 @@ namespace ShenzhenIO.Emulator.Tests.Extensions
 
         public static void ShouldNotDoAnyTests(this CommandExecutionResult result, string when)
         {
-            result.TestResult.Should().Be(TestResult.Indefinite, $"because this command should not check any conditions {when}");
+            result.TestResult.Should().BeNull($"because this command should not check any conditions {when}");
         }
     }
 }
