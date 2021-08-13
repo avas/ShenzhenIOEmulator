@@ -47,19 +47,17 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
             if (_digitNumber >= 0 && _digitNumber <= 2)
             {
-                var digitValue = _digitValue % 10;
+                var digitValue = _digitValue % 10 ?? 0;
                 if (digitValue < 0)
                 {
                     accumulatorValue = -accumulatorValue;
                 }
 
-                var targetPower = (int)Math.Pow(10, _digitNumber.Value);
+                var targetPowerOfTen = (int)Math.Pow(10, _digitNumber.Value);
+                var oldTargetDigitValue = accumulatorValue / targetPowerOfTen % 10 * targetPowerOfTen;
+                var newTargetDigitValue = digitValue * targetPowerOfTen;
 
-                var leftValuePart = accumulatorValue / (targetPower * 10) * targetPower * 10;
-                var rightValuePart = accumulatorValue % targetPower;
-                var targetDigit = targetPower * digitValue.Value;
-
-                newAccumulatorValue = leftValuePart + targetDigit + rightValuePart;
+                newAccumulatorValue = accumulatorValue - oldTargetDigitValue + newTargetDigitValue;
             }
 
             _accumulator.Write(newAccumulatorValue);
