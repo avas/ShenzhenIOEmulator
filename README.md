@@ -6,6 +6,7 @@ If you want to:
 * Automate verification and stats calculation of the level solution (e.g. for some online leaderboard)
 * Push game's limits, e.g. try your solution without code size limits
 * Use code generation to adjust code parameters and try it (or just brute force the solution, e.g. to find the optimal solution for some puzzles like 'Security Nightmare')
+
 ...then this project might be for you - feel free to watch it or post any feature requests 😊
 
 However, there are things that won't be in this project:
@@ -15,7 +16,7 @@ However, there are things that won't be in this project:
 ## Disclaimer
 1. Shenzhen I/O is a registered trademark of [Zachtronics LLC](https://www.zachtronics.com/), and I have absolutely no relation with Zachtronics nor Zach Barth.
 2. This project does not use the code of Shenzhen I/O in any way - this is just an attempt to reverse-engineer the game's engine.
-3. Please do not use this engine for building any Shenzhen I/O-like games. In the end, you will only be able to make games at most like Shenzhen I/O or (maybe, after some modification) TIS-100, but who would play yet another clone if they could play an original?
+3. Please do not use this engine for building any Shenzhen I/O-like games. In the end, you will only be able to make games at most like Shenzhen I/O or (maybe, after some modification) [TIS-100](https://www.zachtronics.com/tis-100), but who would play yet another clone if they could play an original?
 4. This project is still in active development, so many things might not be implelmented yet.
 
 ## Current state
