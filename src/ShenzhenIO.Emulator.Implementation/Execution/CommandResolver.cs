@@ -26,6 +26,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
                 {
                     Succeeded = true,
                     Description = commandDescription,
+                    Labels = commandDescription.Labels,
                 };
 
                 foreach (var label in commandDescription.Labels)

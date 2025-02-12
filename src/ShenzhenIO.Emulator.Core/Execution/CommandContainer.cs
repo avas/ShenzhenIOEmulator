@@ -8,6 +8,7 @@ namespace ShenzhenIO.Emulator.Core.Execution
         public TokenizedCommand Description { get; set; }
 
         public bool Succeeded { get; set; }
+        public IList<string> Labels { get; set; }
         public ICommand Command { get; set; }
         public IList<string> ErrorMessages { get; set; } = new List<string>();
 

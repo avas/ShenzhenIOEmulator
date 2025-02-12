@@ -30,7 +30,7 @@ namespace ShenzhenIO.Emulator.Tests.Execution
             new object[]
             {
                 new[] { "foo" },
-                new[] { $"Failed to parse input value: {_commandParameterResolverErrorMessage}" }
+                new[] { $"Failed to resolve input value: {_commandParameterResolverErrorMessage}" }
             },
         };
 
