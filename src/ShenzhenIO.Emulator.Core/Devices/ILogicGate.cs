@@ -4,10 +4,10 @@ namespace ShenzhenIO.Emulator.Core.Devices
 {
     public interface ILogicGate : IDevice
     {
-        IAnalogPort InputA { get; }
-        IAnalogPort InputB { get; }
+        ISimplePort InputA { get; }
+        ISimplePort InputB { get; }
 
-        IAnalogPort NormalOutput { get; }
-        IAnalogPort InvertedOutput { get; }
+        ISimplePort NormalOutput { get; }
+        ISimplePort InvertedOutput { get; }
     }
 }

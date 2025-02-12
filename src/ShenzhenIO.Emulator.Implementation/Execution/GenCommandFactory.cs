@@ -13,7 +13,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
             _commandParameterResolver = commandParameterResolver;
         }
 
-        public bool TryCreateCommand(IList<string> arguments, CommandFactoryContext context, out ICommand command, out IList<string> errorMessages)
+        public bool TryCreateCommand(IList<string> arguments, CommandFactoryContext context, out ICommand? command, out IList<string> errorMessages)
         {
             command = null;
             errorMessages = new List<string>();
@@ -50,7 +50,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
             if (result)
             {
-                command = new GenCommand(analogPort, highPulseDurationSource, lowPulseDurationSource);
+                command = new GenCommand(analogPort!, highPulseDurationSource!, lowPulseDurationSource!);
             }
 
             return result;

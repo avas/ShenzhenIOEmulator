@@ -4,18 +4,11 @@ using ShenzhenIO.Emulator.Core.IO;
 
 namespace ShenzhenIO.Emulator.Implementation.Execution
 {
-    public class SlxCommand : ICommand
+    public class SlxCommand(IXBusPort targetPort) : ICommand
     {
-        private readonly IXBusPort _targetPort;
-
-        public SlxCommand(IXBusPort targetPort)
-        {
-            _targetPort = targetPort ?? throw new ArgumentNullException(nameof(targetPort));
-        }
-
         public CommandExecutionResult Execute()
         {
-            return !_targetPort.HasValue
+            return !targetPort.HasValue
                 ? CommandExecutionResult.Sleeping(null)
                 : CommandExecutionResult.Finished();
         }

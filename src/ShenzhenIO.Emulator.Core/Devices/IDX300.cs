@@ -6,8 +6,8 @@ namespace ShenzhenIO.Emulator.Core.Devices
     {
         IXBusPort Input { get; }
 
-        IAnalogPort P0 { get; }
-        IAnalogPort P1 { get; }
-        IAnalogPort P2 { get; }
+        ISimplePort P0 { get; }
+        ISimplePort P1 { get; }
+        ISimplePort P2 { get; }
     }
 }

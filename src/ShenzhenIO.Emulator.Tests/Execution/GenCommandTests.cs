@@ -13,7 +13,7 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var analogPortMock = new Mock<IAnalogPort>();
+            var analogPortMock = new Mock<ISimplePort>();
             analogPortMock.Setup(x => x.Write(It.IsAny<int>()));
 
             var highPulseDurationSourceMock = new Mock<IReadable>();
@@ -66,7 +66,7 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var analogPortMock = new Mock<IAnalogPort>();
+            var analogPortMock = new Mock<ISimplePort>();
             analogPortMock.Setup(x => x.Write(It.IsAny<int>()));
 
             var highPulseDurationSourceMock = new Mock<IReadable>();

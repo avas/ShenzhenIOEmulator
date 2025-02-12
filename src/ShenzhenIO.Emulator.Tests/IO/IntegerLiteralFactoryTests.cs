@@ -6,21 +6,16 @@ namespace ShenzhenIO.Emulator.Tests.IO
 {
     public class IntegerLiteralFactoryTests
     {
-        public static object[][] LiteralCreationTestCases =
-        {
-            new object[] { "-1000", false, 0, "Value too small: -1000" },
-            new object[] { "-999", true, -999, null },
-            new object[] { "-100", true, -100, null },
-            new object[] { "0", true, 0, null },
-            new object[] { "11", true, 11, null },
-            new object[] { "011", true, 11, null },
-            new object[] { "100", true, 100, null },
-            new object[] { "1000", false, 0, "Value too large: 1000" },
-        };
-
         [Theory]
-        [MemberData(nameof(LiteralCreationTestCases))]
-        public void TestCreatingLiterals(string argument, bool expectedResult, int expectedValue, string expectedErrorMessage)
+        [InlineData("-1000", false, 0, "Value too small: -1000")]
+        [InlineData("-999", true, -999, null)]
+        [InlineData("-100", true, -100, null)]
+        [InlineData("0", true, 0, null)]
+        [InlineData("11", true, 11, null)]
+        [InlineData("011", true, 11, null)]
+        [InlineData("100", true, 100, null)]
+        [InlineData("1000", false, 0, "Value too large: 1000")]
+        public void TestCreatingLiterals(string argument, bool expectedResult, int expectedValue, string? expectedErrorMessage)
         {
             // Arrange
             var factory = new IntegerLiteralFactory();
@@ -38,6 +33,8 @@ namespace ShenzhenIO.Emulator.Tests.IO
             }
             else
             {
+                readable.Should().NotBeNull();
+                
                 var readResult = readable.TryRead(out var actualValue);
 
                 readResult.Should().BeTrue();

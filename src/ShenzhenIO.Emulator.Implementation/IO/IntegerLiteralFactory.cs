@@ -5,7 +5,7 @@ namespace ShenzhenIO.Emulator.Implementation.IO
 {
     public class IntegerLiteralFactory : IIntegerLiteralFactory
     {
-        public bool TryCreateReadable(string argument, out IReadable readable, out string errorMessage)
+        public bool TryCreateReadable(string argument, out IReadable? readable, out string? errorMessage)
         {
             readable = null;
             errorMessage = null;

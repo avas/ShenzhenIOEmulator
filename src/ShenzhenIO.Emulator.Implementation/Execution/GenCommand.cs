@@ -6,7 +6,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 {
     public class GenCommand : ICommand, ISleepHandler
     {
-        private readonly IAnalogPort _outputPort;
+        private readonly ISimplePort _outputPort;
         private readonly IReadable _highPulseDurationSource;
         private readonly IReadable _lowPulseDurationSource;
 
@@ -16,7 +16,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
         private int? _remainingHighPulseDuration;
         private int? _remainingLowPulseDuration;
 
-        public GenCommand(IAnalogPort outputPort, IReadable highPulseDurationSource, IReadable lowPulseDurationSource)
+        public GenCommand(ISimplePort outputPort, IReadable highPulseDurationSource, IReadable lowPulseDurationSource)
         {
             _outputPort = outputPort ?? throw new ArgumentNullException(nameof(outputPort));
             _highPulseDurationSource = highPulseDurationSource ?? throw new ArgumentNullException(nameof(highPulseDurationSource));
@@ -55,7 +55,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
             {
                 _remainingHighPulseDuration = _highPulseDuration;
 
-                _outputPort.Write(AnalogPortConstants.High);
+                _outputPort.Write(SimpleNetworkConstants.High);
             }
 
             if (_remainingHighPulseDuration > 0)
@@ -67,7 +67,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
             {
                 _remainingLowPulseDuration = _lowPulseDuration;
 
-                _outputPort.Write(AnalogPortConstants.Low);
+                _outputPort.Write(SimpleNetworkConstants.Low);
             }
 
             if (_remainingLowPulseDuration > 0)

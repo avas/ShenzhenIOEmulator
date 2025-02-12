@@ -13,7 +13,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
             _commandParameterResolver = commandParameterResolver;
         }
 
-        public bool TryCreateCommand(IList<string> arguments, CommandFactoryContext context, out ICommand command, out IList<string> errorMessages)
+        public bool TryCreateCommand(IList<string> arguments, CommandFactoryContext context, out ICommand? command, out IList<string> errorMessages)
         {
             command = null;
             errorMessages = new List<string>();
@@ -34,7 +34,7 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
                 return false;
             }
 
-            command = new AddCommand(context.Accumulator, valueSource);
+            command = new AddCommand(context.Accumulator, valueSource!);
 
             return true;
         }

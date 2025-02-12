@@ -4,20 +4,13 @@ using ShenzhenIO.Emulator.Core.Language;
 
 namespace ShenzhenIO.Emulator.Implementation.Language
 {
-    public class CommandParameterResolver : ICommandParameterResolver
+    public class CommandParameterResolver(
+        IReadableWrapperFactory readableWrapperFactory,
+        IWritableWrapperFactory writableWrapperFactory,
+        IIntegerLiteralFactory integerLiteralFactory)
+        : ICommandParameterResolver
     {
-        private readonly IReadableWrapperFactory _readableWrapperFactory;
-        private readonly IWritableWrapperFactory _writableWrapperFactory;
-        private readonly IIntegerLiteralFactory _integerLiteralFactory;
-
-        public CommandParameterResolver(IReadableWrapperFactory readableWrapperFactory, IWritableWrapperFactory writableWrapperFactory, IIntegerLiteralFactory integerLiteralFactory)
-        {
-            _readableWrapperFactory = readableWrapperFactory;
-            _writableWrapperFactory = writableWrapperFactory;
-            _integerLiteralFactory = integerLiteralFactory;
-        }
-
-        public bool TryGetReadable(string argument, CommandFactoryContext context, out IReadable readable, out string errorMessage)
+        public bool TryGetReadable(string argument, CommandFactoryContext context, out IReadable? readable, out string? errorMessage)
         {
             errorMessage = null;
 
@@ -25,11 +18,11 @@ namespace ShenzhenIO.Emulator.Implementation.Language
 
             if (context.Registers.TryGetValue(argument, out var register))
             {
-                readable = _readableWrapperFactory.Wrap(register);
+                readable = readableWrapperFactory.Wrap(register);
             }
             else if (context.AnalogPorts.TryGetValue(argument, out var analogPort))
             {
-                readable = _readableWrapperFactory.Wrap(analogPort);
+                readable = readableWrapperFactory.Wrap(analogPort);
             }
             else if (context.XBusPorts.TryGetValue(argument, out var xBusPort))
             {
@@ -37,7 +30,7 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             }
             else
             {
-                result = _integerLiteralFactory.TryCreateReadable(argument, out readable, out errorMessage);
+                result = integerLiteralFactory.TryCreateReadable(argument, out readable, out errorMessage);
 
                 if (!result)
                 {
@@ -48,7 +41,7 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             return result;
         }
 
-        public bool TryGetWritable(string argument, CommandFactoryContext context, out IWritable writable, out string errorMessage)
+        public bool TryGetWritable(string argument, CommandFactoryContext context, out IWritable? writable, out string? errorMessage)
         {
             errorMessage = null;
 
@@ -56,11 +49,11 @@ namespace ShenzhenIO.Emulator.Implementation.Language
 
             if (context.Registers.TryGetValue(argument, out var register))
             {
-                writable = _writableWrapperFactory.Wrap(register);
+                writable = writableWrapperFactory.Wrap(register);
             }
             else if (context.AnalogPorts.TryGetValue(argument, out var analogPort))
             {
-                writable = _writableWrapperFactory.Wrap(analogPort);
+                writable = writableWrapperFactory.Wrap(analogPort);
             }
             else if (context.XBusPorts.TryGetValue(argument, out var xBusPort))
             {
@@ -76,9 +69,9 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             return result;
         }
 
-        public bool TryGetAnalogPort(string argument, CommandFactoryContext context, out IAnalogPort analogPort, out string errorMessage)
+        public bool TryGetAnalogPort(string argument, CommandFactoryContext context, out ISimplePort? simplePort, out string? errorMessage)
         {
-            var result = context.AnalogPorts.TryGetValue(argument, out analogPort);
+            var result = context.AnalogPorts.TryGetValue(argument, out simplePort);
 
             errorMessage = result
                 ? null
@@ -87,7 +80,7 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             return result;
         }
 
-        public bool TryGetXBusPort(string argument, CommandFactoryContext context, out IXBusPort xBusPort, out string errorMessage)
+        public bool TryGetXBusPort(string argument, CommandFactoryContext context, out IXBusPort? xBusPort, out string? errorMessage)
         {
             var result = context.XBusPorts.TryGetValue(argument, out xBusPort);
 

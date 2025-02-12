@@ -13,8 +13,8 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             "\n",
         };
 
-        private const char _commentSeparator = '#';
-        private const char _labelSeparator = ':';
+        private const char CommentSeparator = '#';
+        private const char LabelSeparator = ':';
 
         public CommandTokenizationResult Parse(string program)
         {
@@ -68,18 +68,18 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             return result;
         }
 
-        private (string remainingCommand, string comment) StripComment(string command)
+        private (string remainingCommand, string? comment) StripComment(string command)
         {
-            var commandParts = command.Split(new[] { _commentSeparator }, 2);
+            var commandParts = command.Split(new[] { CommentSeparator }, 2);
 
             return commandParts.Length == 2
                 ? (commandParts[0].Trim(), commandParts[1].Trim())
                 : (command, null);
         }
 
-        private (string remainingCommand, string label) StripLabel(string command)
+        private (string remainingCommand, string? label) StripLabel(string command)
         {
-            var commandParts = command.Split(new[] { _labelSeparator }, 2);
+            var commandParts = command.Split(new[] { LabelSeparator }, 2);
 
             return commandParts.Length == 2
                 ? (commandParts[1].Trim(), commandParts[0].Trim())
@@ -111,9 +111,9 @@ namespace ShenzhenIO.Emulator.Implementation.Language
             return (remainingCommand, condition);
         }
 
-        private (string instruction, IList<string> arguments) SplitCommand(string command)
+        private (string? instruction, IList<string> arguments) SplitCommand(string command)
         {
-            (string instruction, IList<string> arguments) = (null, Array.Empty<string>());
+            (string? instruction, IList<string> arguments) = (null, Array.Empty<string>());
 
             if (!string.IsNullOrEmpty(command))
             {
@@ -135,7 +135,7 @@ namespace ShenzhenIO.Emulator.Implementation.Language
 
             var collectedLabels = new List<string>();
             var lineNumbers = new List<int>();
-            string lastComment = null;
+            string? lastComment = null;
 
             foreach (var command in rawCommands)
             {

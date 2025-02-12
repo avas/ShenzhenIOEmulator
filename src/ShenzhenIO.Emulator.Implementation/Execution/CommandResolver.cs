@@ -22,23 +22,18 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
 
             foreach (var commandDescription in commandDescriptions)
             {
-                var container = new CommandContainer
+                var container = new CommandContainer(commandDescription)
                 {
                     Succeeded = true,
-                    Description = commandDescription,
                     Labels = commandDescription.Labels,
                 };
 
                 foreach (var label in commandDescription.Labels)
                 {
-                    if (knownLabels.Contains(label))
+                    if (!knownLabels.Add(label))
                     {
                         container.Succeeded = false;
                         container.ErrorMessages.Add($"Duplicate label: {label}");
-                    }
-                    else
-                    {
-                        knownLabels.Add(label);
                     }
                 }
 
@@ -52,6 +47,12 @@ namespace ShenzhenIO.Emulator.Implementation.Execution
                 var commandDescription = commandDescriptions[i];
                 var container = containers[i];
 
+                if (string.IsNullOrEmpty(commandDescription.Instruction))
+                {
+                    // The command is just a comment - we can skip it.
+                    continue;
+                }
+                
                 if (!_knownCommandFactories.TryGetValue(commandDescription.Instruction, out var commandFactory))
                 {
                     container.Succeeded = false;

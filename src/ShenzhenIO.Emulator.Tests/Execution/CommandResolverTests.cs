@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Moq;
 using ShenzhenIO.Emulator.Core.Execution;
+using ShenzhenIO.Emulator.Core.IO;
 using ShenzhenIO.Emulator.Core.Language;
 using ShenzhenIO.Emulator.Implementation.Execution;
 using ShenzhenIO.Emulator.Tests.Extensions;
@@ -20,17 +21,17 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         private const string FirstLabel = "label1";
         private const string SecondLabel = "label2";
 
-        private static readonly IList<string> ExpectedKnownLabels = new[]
-        {
+        private static readonly IList<string> ExpectedKnownLabels =
+        [
             FirstLabel,
-            SecondLabel,
-        };
+            SecondLabel
+        ];
 
         private static readonly TokenizedCommand FirstCommandDescription = new TokenizedCommand
         {
-            Labels = new[] { FirstLabel },
+            Labels = [FirstLabel],
             Instruction = FirstKnownInstruction,
-            Arguments = new[] { "argument-1", "argument-2" },
+            Arguments = ["argument-1", "argument-2"],
         };
 
         private static readonly TokenizedCommand SecondCommandDescription = new TokenizedCommand
@@ -42,35 +43,35 @@ namespace ShenzhenIO.Emulator.Tests.Execution
 
         private static readonly TokenizedCommand ThirdCommandDescription = new TokenizedCommand
         {
-            Labels = new[] { SecondLabel },
+            Labels = [SecondLabel],
             Instruction = ThirdKnownInstruction,
-            Arguments = new[] { "some", "argument", "value" },
+            Arguments = ["some", "argument", "value"],
         };
 
         private static readonly TokenizedCommand FourthCommandDescription = new TokenizedCommand
         {
             Labels = Array.Empty<string>(),
             Instruction = FourthKnownInstruction,
-            Arguments = new[] { "with-one-argument" },
+            Arguments = ["with-one-argument"],
         };
 
         private static readonly TokenizedCommand UnknownCommandDescription = new TokenizedCommand
         {
             Labels = Array.Empty<string>(),
             Instruction = "invalid-command",
-            Arguments = new[] { "another", "set", "of", "arguments" },
+            Arguments = ["another", "set", "of", "arguments"],
         };
 
-        private static readonly IList<string> SecondInstructionErrors = new[]
-        {
+        private static readonly IList<string> SecondInstructionErrors =
+        [
             "Command instantiation is supposed to fail in this test.",
-            "Also, it will have multiple error messages.",
-        };
+            "Also, it will have multiple error messages."
+        ];
 
-        private static readonly IList<string> FourthInstructionErrors = new[]
-        {
-            $"Do not use '{FourthKnownInstruction}' in your programs, we failed to implement it. :(",
-        };
+        private static readonly IList<string> FourthInstructionErrors =
+        [
+            $"Please avoid using '{FourthKnownInstruction}' in your programs because we failed to implement it. :("
+        ];
 
         private static readonly ICommand FirstCommand = Mock.Of<ICommand>();
         private static readonly ICommand ThirdCommand = Mock.Of<ICommand>();
@@ -80,7 +81,8 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorStub = Mock.Of<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorStub);
             var knownCommandFactories = BuildCommandFactories(commandFactoryContext);
 
             var resolver = new CommandResolver(knownCommandFactories);
@@ -123,7 +125,8 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorStub = Mock.Of<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorStub);
             var knownCommandFactories = BuildCommandFactories(commandFactoryContext);
 
             var resolver = new CommandResolver(knownCommandFactories);
@@ -155,7 +158,8 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorStub = Mock.Of<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorStub);
             var knownCommandFactories = BuildCommandFactories(commandFactoryContext);
 
             var resolver = new CommandResolver(knownCommandFactories);
@@ -189,8 +193,8 @@ namespace ShenzhenIO.Emulator.Tests.Execution
 
             result.CommandContainers[0].ShouldDenoteSuccess(FirstCommandDescription, FirstCommand, "because first instruction is known to the resolver, and its factory should succeed");
             result.CommandContainers[1].ShouldDenoteSuccess(ThirdCommandDescription, ThirdCommand, "because second instruction is known to the resolver, and its factory should succeed");
-            result.CommandContainers[2].ShouldDenoteFailure(FirstCommandDescription, thirdCommandErrors, "because third command's label duplicate the label of first command");
-            result.CommandContainers[3].ShouldDenoteFailure(ThirdCommandDescription, fourthCommandErrors, "because fourth command's label duplicate the label of second command");
+            result.CommandContainers[2].ShouldDenoteFailure(FirstCommandDescription, thirdCommandErrors, "because third command's label duplicates the label of first command");
+            result.CommandContainers[3].ShouldDenoteFailure(ThirdCommandDescription, fourthCommandErrors, "because fourth command's label duplicates the label of second command");
 
             commandFactoryContext.Labels.Should().BeEquivalentTo(ExpectedKnownLabels);
         }
@@ -199,21 +203,21 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         private IDictionary<string, ICommandFactory> BuildCommandFactories(CommandFactoryContext commandFactoryContext)
         {
             var firstCommand = FirstCommand;
-            IList<string> firstCommandCreationErrors = null;
+            IList<string>? firstCommandCreationErrors = null;
             var firstCommandFactoryMock = new Mock<ICommandFactory>();
             firstCommandFactoryMock.Setup(x => x.TryCreateCommand(It.IsAny<IList<string>>(), commandFactoryContext, out firstCommand, out firstCommandCreationErrors)).Returns(true);
 
-            ICommand secondCommand = null;
+            ICommand? secondCommand = null;
             var secondCommandCreationErrors = SecondInstructionErrors;
             var secondCommandFactoryMock = new Mock<ICommandFactory>();
             secondCommandFactoryMock.Setup(x => x.TryCreateCommand(It.IsAny<IList<string>>(), commandFactoryContext, out secondCommand, out secondCommandCreationErrors)).Returns(false);
 
             var thirdCommand = ThirdCommand;
-            IList<string> thirdCommandCreationErrors = null;
+            IList<string>? thirdCommandCreationErrors = null;
             var thirdCommandFactoryMock = new Mock<ICommandFactory>();
             thirdCommandFactoryMock.Setup(x => x.TryCreateCommand(It.IsAny<IList<string>>(), commandFactoryContext, out thirdCommand, out thirdCommandCreationErrors)).Returns(true);
 
-            ICommand fourthCommand = null;
+            ICommand? fourthCommand = null;
             var fourthCommandCreationErrors = FourthInstructionErrors;
             var fourthCommandFactoryMock = new Mock<ICommandFactory>();
             fourthCommandFactoryMock.Setup(x => x.TryCreateCommand(It.IsAny<IList<string>>(), commandFactoryContext, out fourthCommand, out fourthCommandCreationErrors)).Returns(false);

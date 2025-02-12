@@ -2,6 +2,6 @@
 {
     public interface IWritableWrapperFactory
     {
-        IWritable Wrap(ISyncWritable syncWritable);
+        IWritable? Wrap(ISyncWritable syncWritable);
     }
 }

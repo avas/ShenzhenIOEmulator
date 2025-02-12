@@ -6,9 +6,9 @@
 
         public DeviceState NextDeviceState { get; set; }
         public TestResult? TestResult { get; set; }
-        public string NextDestination { get; set; }
+        public string? NextDestination { get; set; }
 
-        public ISleepHandler SleepHandler { get; set; }
+        public ISleepHandler? SleepHandler { get; set; }
 
         public static CommandExecutionResult Finished()
         {
@@ -19,7 +19,7 @@
             };
         }
 
-        public static CommandExecutionResult Sleeping(ISleepHandler sleepHandler)
+        public static CommandExecutionResult Sleeping(ISleepHandler? sleepHandler)
         {
             return new CommandExecutionResult
             {

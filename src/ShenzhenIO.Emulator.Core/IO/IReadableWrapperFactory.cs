@@ -2,6 +2,6 @@
 {
     public interface IReadableWrapperFactory
     {
-        IReadable Wrap(ISyncReadable syncReadable);
+        IReadable? Wrap(ISyncReadable syncReadable);
     }
 }

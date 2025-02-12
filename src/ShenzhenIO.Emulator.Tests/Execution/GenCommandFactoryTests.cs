@@ -1,32 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
 using FluentAssertions;
+
 using Moq;
+
 using ShenzhenIO.Emulator.Core.Execution;
 using ShenzhenIO.Emulator.Core.IO;
 using ShenzhenIO.Emulator.Core.Language;
 using ShenzhenIO.Emulator.Implementation.Execution;
 using ShenzhenIO.Emulator.Tests.Extensions;
+
 using Xunit;
 
 namespace ShenzhenIO.Emulator.Tests.Execution
 {
     public class GenCommandFactoryTests
     {
-        public static readonly object[][] GenCommandCreationFailureTestCases =
+        public static readonly TheoryData<IList<string>, IList<string>> GenCommandCreationFailureTestCases = new()
         {
-            new object[] { Array.Empty<string>(), new[] { "Incorrect argument count (expected 3)" } },
-            new object[] { new[] { "foo", "bar" }, new[] { "Incorrect argument count (expected 3)" } },
-            new object[] { new[] { "foo", "bar", "baz", "blech" }, new[] { "Incorrect argument count (expected 3)" } },
-            new object[] { new[] { "foo", "valid-arg-1", "valid-arg-2" }, new[] { "Failed to find analog port: Expected error message" } },
-            new object[]
+            { [], ["Incorrect argument count (expected 3)"] },
+            { ["foo", "bar"], ["Incorrect argument count (expected 3)"] },
+            { ["foo", "bar", "baz", "blech"], ["Incorrect argument count (expected 3)"] },
+            { ["foo", "valid-arg-1", "valid-arg-2"], ["Failed to find analog port: Expected error message"] },
             {
-                new[] { "p0", "invalid-arg-1", "invalid-arg-2" },
-                new[]
-                {
+                ["p0", "invalid-arg-1", "invalid-arg-2"],
+                [
                     "Failed to parse high pulse duration: Expected error message",
-                    "Failed to parse low pulse duration: Expected error message",
-                }
+                    "Failed to parse low pulse duration: Expected error message"
+                ]
             },
         };
 
@@ -36,26 +37,27 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorStub = Mock.Of<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorStub);
 
-            var knownAnalogPort = Mock.Of<IAnalogPort>();
+            var knownAnalogPort = Mock.Of<ISimplePort>();
             var firstKnownReadable = Mock.Of<IReadable>();
             var secondKnownReadable = Mock.Of<IReadable>();
 
             var commandParameterResolverMock = new Mock<ICommandParameterResolver>();
 
-            IAnalogPort unknownAnalogPort = null;
+            ISimplePort? unknownSimplePort = null;
             var unknownAnalogPortErrorMessage = "Expected error message";
-            commandParameterResolverMock.Setup(x => x.TryGetAnalogPort(It.IsAny<string>(), commandFactoryContext, out unknownAnalogPort, out unknownAnalogPortErrorMessage)).Returns(false);
+            commandParameterResolverMock.Setup(x => x.TryGetAnalogPort(It.IsAny<string>(), commandFactoryContext, out unknownSimplePort, out unknownAnalogPortErrorMessage)).Returns(false);
 
-            string knownAnalogPortErrorMessage = null;
+            string? knownAnalogPortErrorMessage = null;
             commandParameterResolverMock.Setup(x => x.TryGetAnalogPort("p0", commandFactoryContext, out knownAnalogPort, out knownAnalogPortErrorMessage)).Returns(true);
 
-            IReadable unknownReadable = null;
+            IReadable? unknownReadable = null;
             var unknownReadableErrorMessage = "Expected error message";
             commandParameterResolverMock.Setup(x => x.TryGetReadable(It.IsAny<string>(), commandFactoryContext, out unknownReadable, out unknownReadableErrorMessage)).Returns(false);
 
-            string knownReadableErrorMessage = null;
+            string? knownReadableErrorMessage = null;
             commandParameterResolverMock.Setup(x => x.TryGetReadable("valid-arg-1", commandFactoryContext, out firstKnownReadable, out knownReadableErrorMessage)).Returns(true);
             commandParameterResolverMock.Setup(x => x.TryGetReadable("valid-arg-2", commandFactoryContext, out secondKnownReadable, out knownReadableErrorMessage)).Returns(true);
 
@@ -76,9 +78,10 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorStub = Mock.Of<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorStub);
 
-            var knownAnalogPortMock = new Mock<IAnalogPort>();
+            var knownAnalogPortMock = new Mock<ISimplePort>();
 
             var firstKnownReadableMock = new Mock<IReadable>();
             var highPulseDuration = 0;
@@ -91,12 +94,12 @@ namespace ShenzhenIO.Emulator.Tests.Execution
             var commandParameterResolverMock = new Mock<ICommandParameterResolver>();
 
             var knownAnalogPort = knownAnalogPortMock.Object;
-            string knownAnalogPortErrorMessage = null;
+            string? knownAnalogPortErrorMessage = null;
             commandParameterResolverMock.Setup(x => x.TryGetAnalogPort("p0", commandFactoryContext, out knownAnalogPort, out knownAnalogPortErrorMessage)).Returns(true);
 
             var firstKnownReadable = firstKnownReadableMock.Object;
             var secondKnownReadable = secondKnownReadableMock.Object;
-            string knownReadableErrorMessage = null;
+            string? knownReadableErrorMessage = null;
             commandParameterResolverMock.Setup(x => x.TryGetReadable("valid-arg-1", commandFactoryContext, out firstKnownReadable, out knownReadableErrorMessage)).Returns(true);
             commandParameterResolverMock.Setup(x => x.TryGetReadable("valid-arg-2", commandFactoryContext, out secondKnownReadable, out knownReadableErrorMessage)).Returns(true);
 
@@ -115,8 +118,8 @@ namespace ShenzhenIO.Emulator.Tests.Execution
             var commandExecutionResult = actualCommand.Execute();
             commandExecutionResult.ShouldBeAFinishedResult("after execution of created command");
 
-            knownAnalogPortMock.Verify(x => x.Write(AnalogPortConstants.High), Times.Once());
-            knownAnalogPortMock.Verify(x => x.Write(AnalogPortConstants.Low), Times.Once());
+            knownAnalogPortMock.Verify(x => x.Write(SimpleNetworkConstants.High), Times.Once());
+            knownAnalogPortMock.Verify(x => x.Write(SimpleNetworkConstants.Low), Times.Once());
             knownAnalogPortMock.Verify(x => x.Write(It.IsAny<int>()), Times.Exactly(2));
 
             firstKnownReadableMock.Verify(x => x.TryRead(out highPulseDuration), Times.Once());

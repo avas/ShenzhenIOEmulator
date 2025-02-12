@@ -13,24 +13,21 @@ namespace ShenzhenIO.Emulator.Tests.Execution
 {
     public class AddCommandFactoryTests
     {
-        private const string _commandParameterResolverErrorMessage = "Unknown register: foo";
+        private const string CommandParameterResolverErrorMessage = "Unknown register: foo";
 
-        public static object[][] AddCommandFactoryFailureTestCases =
+        public static TheoryData<IList<string>, IList<string>> AddCommandFactoryFailureTestCases = new()
         {
-            new object[]
             {
                 Array.Empty<string>(),
-                new[] { "Incorrect argument count (expected 1)" },
+                ["Incorrect argument count (expected 1)"]
             },
-            new object[]
             {
-                new[] { "foo", "bar" },
-                new[] { "Incorrect argument count (expected 1)" },
+                ["foo", "bar"],
+                ["Incorrect argument count (expected 1)"]
             },
-            new object[]
             {
-                new[] { "foo" },
-                new[] { $"Failed to resolve input value: {_commandParameterResolverErrorMessage}" }
+                ["foo"],
+                [$"Failed to resolve input value: {CommandParameterResolverErrorMessage}"]
             },
         };
 
@@ -40,11 +37,12 @@ namespace ShenzhenIO.Emulator.Tests.Execution
         {
             // Arrange
 
-            var commandFactoryContext = new CommandFactoryContext();
+            var accumulatorMock = new Mock<IRegister>();
+            var commandFactoryContext = new CommandFactoryContext(accumulatorMock.Object);
 
             var commandParameterResolverMock = new Mock<ICommandParameterResolver>();
-            IReadable valueSource = null;
-            var errorMessage = _commandParameterResolverErrorMessage;
+            IReadable? valueSource = null;
+            var errorMessage = CommandParameterResolverErrorMessage;
             commandParameterResolverMock.Setup(x => x.TryGetReadable(It.IsAny<string>(), commandFactoryContext, out valueSource, out errorMessage)).Returns(false);
 
             var factory = new AddCommandFactory(commandParameterResolverMock.Object);
@@ -68,10 +66,7 @@ namespace ShenzhenIO.Emulator.Tests.Execution
             var accumulatorMock = new Mock<IRegister>();
             accumulatorMock.Setup(x => x.Read()).Returns(123);
 
-            var commandFactoryContext = new CommandFactoryContext
-            {
-                Accumulator = accumulatorMock.Object,
-            };
+            var commandFactoryContext = new CommandFactoryContext(accumulatorMock.Object);
 
             var valueSourceMock = new Mock<IReadable>();
             var inputValue = 45;
@@ -80,13 +75,13 @@ namespace ShenzhenIO.Emulator.Tests.Execution
             var commandParameterResolverMock = new Mock<ICommandParameterResolver>();
 
             var valueSource = valueSourceMock.Object;
-            string errorMessage = null;
+            string? errorMessage = null;
             commandParameterResolverMock.Setup(x => x.TryGetReadable(It.IsAny<string>(), commandFactoryContext, out valueSource, out errorMessage)).Returns(true);
 
             var factory = new AddCommandFactory(commandParameterResolverMock.Object);
 
             // Act
-            var actualResult = factory.TryCreateCommand(new[] { "foo" }, commandFactoryContext, out var actualCommand, out var actualErrorMessages);
+            var actualResult = factory.TryCreateCommand(["foo"], commandFactoryContext, out var actualCommand, out var actualErrorMessages);
 
             // Assert
 

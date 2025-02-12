@@ -14,39 +14,39 @@ namespace ShenzhenIO.Emulator.Tests.Language
         private static readonly IRegister _dat = Mock.Of<IRegister>();
         private static readonly IRegister _null = Mock.Of<IRegister>();
 
-        private static readonly IAnalogPort _p0 = Mock.Of<IAnalogPort>();
-        private static readonly IAnalogPort _p1 = Mock.Of<IAnalogPort>();
+        private static readonly ISimplePort _p0 = Mock.Of<ISimplePort>();
+        private static readonly ISimplePort _p1 = Mock.Of<ISimplePort>();
 
         private static readonly IXBusPort _x0 = Mock.Of<IXBusPort>();
         private static readonly IXBusPort _x1 = Mock.Of<IXBusPort>();
         private static readonly IXBusPort _x2 = Mock.Of<IXBusPort>();
         private static readonly IXBusPort _x3 = Mock.Of<IXBusPort>();
 
-        public static object[][] ReadableResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, IReadable?, string?> ReadableResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "dat", false, null, "Invalid or unavailable register: dat" },
-            new object[] { BuildContextForMC4000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable register: x2" },
-            new object[] { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable register: x3" },
-            new object[] { BuildContextForMC4000(), "foo", false, null, "Invalid or unavailable register: foo" },
+            { BuildContextForMC4000(), "dat", false, null, "Invalid or unavailable register: dat" },
+            { BuildContextForMC4000(), "x0", true, _x0, null },
+            { BuildContextForMC4000(), "x1", true, _x1, null },
+            { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable register: x2" },
+            { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable register: x3" },
+            { BuildContextForMC4000(), "foo", false, null, "Invalid or unavailable register: foo" },
 
-            new object[] { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable register: p0" },
-            new object[] { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable register: p1" },
-            new object[] { BuildContextForMC4000X(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000X(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000X(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC4000X(), "x3", true, _x3, null },
+            { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable register: p0" },
+            { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable register: p1" },
+            { BuildContextForMC4000X(), "x0", true, _x0, null },
+            { BuildContextForMC4000X(), "x1", true, _x1, null },
+            { BuildContextForMC4000X(), "x2", true, _x2, null },
+            { BuildContextForMC4000X(), "x3", true, _x3, null },
 
-            new object[] { BuildContextForMC6000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC6000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC6000(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC6000(), "x3", true, _x3, null },
+            { BuildContextForMC6000(), "x0", true, _x0, null },
+            { BuildContextForMC6000(), "x1", true, _x1, null },
+            { BuildContextForMC6000(), "x2", true, _x2, null },
+            { BuildContextForMC6000(), "x3", true, _x3, null },
         };
 
         [Theory]
         [MemberData(nameof(ReadableResolvingTestCases))]
-        public void TestResolvingXBusPortsAsReadables(CommandFactoryContext context, string argument, bool expectedResult, IReadable expectedReadable, string expectedErrorMessage)
+        public void TestResolvingXBusPortsAsReadables(CommandFactoryContext context, string argument, bool expectedResult, IReadable? expectedReadable, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -63,20 +63,20 @@ namespace ShenzhenIO.Emulator.Tests.Language
             testContext.ReadableWrapperFactoryMock.Verify(x => x.Wrap(It.IsAny<ISyncReadable>()), Times.Never());
         }
 
-        public static object[][] WrappedReadableResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, ISyncReadable, string?> WrappedReadableResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "acc", true, _acc, null },
-            new object[] { BuildContextForMC4000(), "null", true, _null, null },
-            new object[] { BuildContextForMC4000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC4000(), "p1", true, _p1, null },
-            new object[] { BuildContextForMC6000(), "dat", true, _dat, null },
-            new object[] { BuildContextForMC6000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC6000(), "p1", true, _p1, null },
+            { BuildContextForMC4000(), "acc", true, _acc, null },
+            { BuildContextForMC4000(), "null", true, _null, null },
+            { BuildContextForMC4000(), "p0", true, _p0, null },
+            { BuildContextForMC4000(), "p1", true, _p1, null },
+            { BuildContextForMC6000(), "dat", true, _dat, null },
+            { BuildContextForMC6000(), "p0", true, _p0, null },
+            { BuildContextForMC6000(), "p1", true, _p1, null },
         };
 
         [Theory]
         [MemberData(nameof(WrappedReadableResolvingTestCases))]
-        public void TestResolvingRegistersAndAnalogPortsAsReadables(CommandFactoryContext context, string argument, bool expectedResult, ISyncReadable expectedWrappedReadable, string expectedErrorMessage)
+        public void TestResolvingRegistersAndAnalogPortsAsReadables(CommandFactoryContext context, string argument, bool expectedResult, ISyncReadable expectedWrappedReadable, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -97,14 +97,14 @@ namespace ShenzhenIO.Emulator.Tests.Language
             testContext.ReadableWrapperFactoryMock.Verify(x => x.Wrap(It.IsAny<ISyncReadable>()), Times.Once());
         }
 
-        public static object[][] LiteralResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string> LiteralResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "-999" },
-            new object[] { BuildContextForMC4000(), "0" },
-            new object[] { BuildContextForMC4000(), "000" },
-            new object[] { BuildContextForMC4000(), "011" },
-            new object[] { BuildContextForMC4000(), "100" },
-            new object[] { BuildContextForMC4000(), "999" },
+            { BuildContextForMC4000(), "-999" },
+            { BuildContextForMC4000(), "0" },
+            { BuildContextForMC4000(), "000" },
+            { BuildContextForMC4000(), "011" },
+            { BuildContextForMC4000(), "100" },
+            { BuildContextForMC4000(), "999" },
         };
 
         [Theory]
@@ -115,7 +115,7 @@ namespace ShenzhenIO.Emulator.Tests.Language
             var testContext = BuildCommandParameterResolver();
 
             var readable = Mock.Of<IReadable>();
-            string errorMessage = null;
+            string? errorMessage = null;
             testContext.IntegerLiteralFactoryMock.Setup(x => x.TryCreateReadable(argument, out readable, out errorMessage)).Returns(true);
 
             var resolver = testContext.CommandParameterResolver;
@@ -129,21 +129,21 @@ namespace ShenzhenIO.Emulator.Tests.Language
             actualErrorMessage.Should().BeNull();
         }
 
-        public static object[][] FailedLiteralResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, string> FailedLiteralResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "-1000", "Value too small: -1000" },
-            new object[] { BuildContextForMC4000(), "1000", "Value too large: 1000" },
-            new object[] { BuildContextForMC4000(), "0", "Using 0 today is not a good idea" },
+            { BuildContextForMC4000(), "-1000", "Value too small: -1000" },
+            { BuildContextForMC4000(), "1000", "Value too large: 1000" },
+            { BuildContextForMC4000(), "0", "Using 0 today is not a good idea" },
         };
 
         [Theory]
         [MemberData(nameof(FailedLiteralResolvingTestCases))]
-        public void TestFailingToResolveLiterals(CommandFactoryContext context, string argument, string expectedErrorMessage)
+        public void TestFailingToResolveLiterals(CommandFactoryContext context, string argument, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
 
-            IReadable readable = null;
+            IReadable? readable = null;
             testContext.IntegerLiteralFactoryMock.Setup(x => x.TryCreateReadable(argument, out readable, out expectedErrorMessage)).Returns(false);
 
             var resolver = testContext.CommandParameterResolver;
@@ -155,38 +155,37 @@ namespace ShenzhenIO.Emulator.Tests.Language
             actualResult.Should().BeFalse();
             actualReadable.Should().BeNull();
             actualErrorMessage.Should().Be(expectedErrorMessage);
-
         }
 
-        public static object[][] WritableResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, IWritable?, string?> WritableResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "dat", false, null, "Invalid or unavailable register: dat" },
-            new object[] { BuildContextForMC4000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable register: x2" },
-            new object[] { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable register: x3" },
-            new object[] { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable register: -999" },
-            new object[] { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable register: 0" },
-            new object[] { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable register: 100" },
-            new object[] { BuildContextForMC4000(), "foo", false, null, "Invalid or unavailable register: foo" },
+            { BuildContextForMC4000(), "dat", false, null, "Invalid or unavailable register: dat" },
+            { BuildContextForMC4000(), "x0", true, _x0, null },
+            { BuildContextForMC4000(), "x1", true, _x1, null },
+            { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable register: x2" },
+            { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable register: x3" },
+            { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable register: -999" },
+            { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable register: 0" },
+            { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable register: 100" },
+            { BuildContextForMC4000(), "foo", false, null, "Invalid or unavailable register: foo" },
 
-            new object[] { BuildContextForMC4000X(), "dat", false, null, "Invalid or unavailable register: dat" },
-            new object[] { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable register: p0" },
-            new object[] { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable register: p1" },
-            new object[] { BuildContextForMC4000X(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000X(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000X(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC4000X(), "x3", true, _x3, null },
+            { BuildContextForMC4000X(), "dat", false, null, "Invalid or unavailable register: dat" },
+            { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable register: p0" },
+            { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable register: p1" },
+            { BuildContextForMC4000X(), "x0", true, _x0, null },
+            { BuildContextForMC4000X(), "x1", true, _x1, null },
+            { BuildContextForMC4000X(), "x2", true, _x2, null },
+            { BuildContextForMC4000X(), "x3", true, _x3, null },
 
-            new object[] { BuildContextForMC6000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC6000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC6000(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC6000(), "x3", true, _x3, null },
+            { BuildContextForMC6000(), "x0", true, _x0, null },
+            { BuildContextForMC6000(), "x1", true, _x1, null },
+            { BuildContextForMC6000(), "x2", true, _x2, null },
+            { BuildContextForMC6000(), "x3", true, _x3, null },
         };
 
         [Theory]
         [MemberData(nameof(WritableResolvingTestCases))]
-        public void TestResolvingWritables(CommandFactoryContext context, string argument, bool expectedResult, IWritable expectedWritable, string expectedErrorMessage)
+        public void TestResolvingWritables(CommandFactoryContext context, string argument, bool expectedResult, IWritable? expectedWritable, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -203,20 +202,20 @@ namespace ShenzhenIO.Emulator.Tests.Language
             testContext.WritableWrapperFactoryMock.Verify(x => x.Wrap(It.IsAny<ISyncWritable>()), Times.Never());
         }
 
-        public static object[][] WrappedWritableResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, ISyncWritable, string?> WrappedWritableResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "acc", true, _acc, null },
-            new object[] { BuildContextForMC4000(), "null", true, _null, null },
-            new object[] { BuildContextForMC4000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC4000(), "p1", true, _p1, null },
-            new object[] { BuildContextForMC6000(), "dat", true, _dat, null },
-            new object[] { BuildContextForMC6000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC6000(), "p1", true, _p1, null },
+            { BuildContextForMC4000(), "acc", true, _acc, null },
+            { BuildContextForMC4000(), "null", true, _null, null },
+            { BuildContextForMC4000(), "p0", true, _p0, null },
+            { BuildContextForMC4000(), "p1", true, _p1, null },
+            { BuildContextForMC6000(), "dat", true, _dat, null },
+            { BuildContextForMC6000(), "p0", true, _p0, null },
+            { BuildContextForMC6000(), "p1", true, _p1, null },
         };
 
         [Theory]
         [MemberData(nameof(WrappedWritableResolvingTestCases))]
-        public void TestResolvingRegistersAndAnalogPortsAsWritables(CommandFactoryContext context, string argument, bool expectedResult, ISyncWritable expectedWrappedWritable, string expectedErrorMessage)
+        public void TestResolvingRegistersAndAnalogPortsAsWritables(CommandFactoryContext context, string argument, bool expectedResult, ISyncWritable expectedWrappedWritable, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -237,29 +236,29 @@ namespace ShenzhenIO.Emulator.Tests.Language
             testContext.WritableWrapperFactoryMock.Verify(x => x.Wrap(It.IsAny<ISyncWritable>()), Times.Once());
         }
 
-        public static object[][] AnalogPortResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, ISimplePort?, string?> AnalogPortResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "acc", false, null, "Invalid or unavailable analog port: acc" },
-            new object[] { BuildContextForMC4000(), "null", false, null, "Invalid or unavailable analog port: null" },
-            new object[] { BuildContextForMC4000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC4000(), "p1", true, _p1, null },
-            new object[] { BuildContextForMC4000(), "x0", false, null, "Invalid or unavailable analog port: x0" },
-            new object[] { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable analog port: -999" },
-            new object[] { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable analog port: 0" },
-            new object[] { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable analog port: 100" },
+            { BuildContextForMC4000(), "acc", false, null, "Invalid or unavailable analog port: acc" },
+            { BuildContextForMC4000(), "null", false, null, "Invalid or unavailable analog port: null" },
+            { BuildContextForMC4000(), "p0", true, _p0, null },
+            { BuildContextForMC4000(), "p1", true, _p1, null },
+            { BuildContextForMC4000(), "x0", false, null, "Invalid or unavailable analog port: x0" },
+            { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable analog port: -999" },
+            { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable analog port: 0" },
+            { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable analog port: 100" },
 
-            new object[] { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable analog port: p0" },
-            new object[] { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable analog port: p1" },
+            { BuildContextForMC4000X(), "p0", false, null, "Invalid or unavailable analog port: p0" },
+            { BuildContextForMC4000X(), "p1", false, null, "Invalid or unavailable analog port: p1" },
 
-            new object[] { BuildContextForMC6000(), "dat", false, null, "Invalid or unavailable analog port: dat" },
-            new object[] { BuildContextForMC6000(), "p0", true, _p0, null },
-            new object[] { BuildContextForMC6000(), "p1", true, _p1, null },
-            new object[] { BuildContextForMC6000(), "x3", false, null, "Invalid or unavailable analog port: x3" },
+            { BuildContextForMC6000(), "dat", false, null, "Invalid or unavailable analog port: dat" },
+            { BuildContextForMC6000(), "p0", true, _p0, null },
+            { BuildContextForMC6000(), "p1", true, _p1, null },
+            { BuildContextForMC6000(), "x3", false, null, "Invalid or unavailable analog port: x3" },
         };
 
         [Theory]
         [MemberData(nameof(AnalogPortResolvingTestCases))]
-        public void TestResolvingAnalogPorts(CommandFactoryContext context, string argument, bool expectedResult, IAnalogPort expectedAnalogPort, string expectedErrorMessage)
+        public void TestResolvingAnalogPorts(CommandFactoryContext context, string argument, bool expectedResult, ISimplePort? expectedSimplePort, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -270,40 +269,40 @@ namespace ShenzhenIO.Emulator.Tests.Language
 
             // Assert
             actualResult.Should().Be(expectedResult);
-            actualAnalogPort.Should().BeSameAs(expectedAnalogPort);
+            actualAnalogPort.Should().BeSameAs(expectedSimplePort);
             actualErrorMessage.Should().Be(expectedErrorMessage);
         }
 
-        public static object[][] XBusPortResolvingTestCases =
+        public static TheoryData<CommandFactoryContext, string, bool, IXBusPort?, string?> XBusPortResolvingTestCases = new()
         {
-            new object[] { BuildContextForMC4000(), "acc", false, null, "Invalid or unavailable XBus port: acc" },
-            new object[] { BuildContextForMC4000(), "null", false, null, "Invalid or unavailable XBus port: null" },
-            new object[] { BuildContextForMC4000(), "p0", false, null, "Invalid or unavailable XBus port: p0" },
-            new object[] { BuildContextForMC4000(), "p1", false, null, "Invalid or unavailable XBus port: p1" },
-            new object[] { BuildContextForMC4000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable XBus port: x2" },
-            new object[] { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable XBus port: x3" },
-            new object[] { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable XBus port: -999" },
-            new object[] { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable XBus port: 0" },
-            new object[] { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable XBus port: 100" },
+            { BuildContextForMC4000(), "acc", false, null, "Invalid or unavailable XBus port: acc" },
+            { BuildContextForMC4000(), "null", false, null, "Invalid or unavailable XBus port: null" },
+            { BuildContextForMC4000(), "p0", false, null, "Invalid or unavailable XBus port: p0" },
+            { BuildContextForMC4000(), "p1", false, null, "Invalid or unavailable XBus port: p1" },
+            { BuildContextForMC4000(), "x0", true, _x0, null },
+            { BuildContextForMC4000(), "x1", true, _x1, null },
+            { BuildContextForMC4000(), "x2", false, null, "Invalid or unavailable XBus port: x2" },
+            { BuildContextForMC4000(), "x3", false, null, "Invalid or unavailable XBus port: x3" },
+            { BuildContextForMC4000(), "-999", false, null, "Invalid or unavailable XBus port: -999" },
+            { BuildContextForMC4000(), "0", false, null, "Invalid or unavailable XBus port: 0" },
+            { BuildContextForMC4000(), "100", false, null, "Invalid or unavailable XBus port: 100" },
 
-            new object[] { BuildContextForMC4000X(), "dat", false, null, "Invalid or unavailable XBus port: dat" },
-            new object[] { BuildContextForMC4000X(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC4000X(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC4000X(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC4000X(), "x3", true, _x3, null },
+            { BuildContextForMC4000X(), "dat", false, null, "Invalid or unavailable XBus port: dat" },
+            { BuildContextForMC4000X(), "x0", true, _x0, null },
+            { BuildContextForMC4000X(), "x1", true, _x1, null },
+            { BuildContextForMC4000X(), "x2", true, _x2, null },
+            { BuildContextForMC4000X(), "x3", true, _x3, null },
 
-            new object[] { BuildContextForMC6000(), "dat", false, null, "Invalid or unavailable XBus port: dat" },
-            new object[] { BuildContextForMC6000(), "x0", true, _x0, null },
-            new object[] { BuildContextForMC6000(), "x1", true, _x1, null },
-            new object[] { BuildContextForMC6000(), "x2", true, _x2, null },
-            new object[] { BuildContextForMC6000(), "x3", true, _x3, null },
+            { BuildContextForMC6000(), "dat", false, null, "Invalid or unavailable XBus port: dat" },
+            { BuildContextForMC6000(), "x0", true, _x0, null },
+            { BuildContextForMC6000(), "x1", true, _x1, null },
+            { BuildContextForMC6000(), "x2", true, _x2, null },
+            { BuildContextForMC6000(), "x3", true, _x3, null },
         };
 
         [Theory]
         [MemberData(nameof(XBusPortResolvingTestCases))]
-        public void TestResolvingXBusPorts(CommandFactoryContext context, string argument, bool expectedResult, IXBusPort expectedXBusPort, string expectedErrorMessage)
+        public void TestResolvingXBusPorts(CommandFactoryContext context, string argument, bool expectedResult, IXBusPort? expectedXBusPort, string? expectedErrorMessage)
         {
             // Arrange
             var testContext = BuildCommandParameterResolver();
@@ -356,10 +355,8 @@ namespace ShenzhenIO.Emulator.Tests.Language
 
         private static CommandFactoryContext BuildGenericContext()
         {
-            return new CommandFactoryContext
+            return new CommandFactoryContext(_acc)
             {
-                Accumulator = _acc,
-
                 Registers = new Dictionary<string, IRegister>
                 {
                     { "acc", _acc },
@@ -375,36 +372,41 @@ namespace ShenzhenIO.Emulator.Tests.Language
 
         private static CommandParameterResolverTestContext BuildCommandParameterResolver()
         {
-            var result = new CommandParameterResolverTestContext
-            {
-                ReadableWrapperFactoryMock = new Mock<IReadableWrapperFactory>(),
-                WritableWrapperFactoryMock = new Mock<IWritableWrapperFactory>(),
-                IntegerLiteralFactoryMock = new Mock<IIntegerLiteralFactory>(),
-            };
+            var readableWrapperFactoryMock = new Mock<IReadableWrapperFactory>();
+            readableWrapperFactoryMock
+                .Setup(x => x.Wrap(It.IsAny<ISyncReadable>()))
+                .Returns((IReadable?)null);
+          
+            var writableWrapperFactoryMock = new Mock<IWritableWrapperFactory>();
+            writableWrapperFactoryMock
+                .Setup(x => x.Wrap(It.IsAny<ISyncWritable>()))
+                .Returns((IWritable?)null);
 
-            result.ReadableWrapperFactoryMock.Setup(x => x.Wrap(It.IsAny<ISyncReadable>())).Returns((IReadable)null);
-            result.WritableWrapperFactoryMock.Setup(x => x.Wrap(It.IsAny<ISyncWritable>())).Returns((IWritable)null);
-
-            IReadable readable = null;
-            string errorMessage = null;
-            result.IntegerLiteralFactoryMock.Setup(x => x.TryCreateReadable(It.IsAny<string>(), out readable, out errorMessage)).Returns(false);
-
-            result.CommandParameterResolver = new CommandParameterResolver(
-                result.ReadableWrapperFactoryMock.Object,
-                result.WritableWrapperFactoryMock.Object,
-                result.IntegerLiteralFactoryMock.Object);
-
-            return result;
+            var integerLiteralFactoryMock = new Mock<IIntegerLiteralFactory>();
+            
+            IReadable? readable = null;
+            string? errorMessage = null;
+            integerLiteralFactoryMock
+                .Setup(x => x.TryCreateReadable(It.IsAny<string>(), out readable, out errorMessage))
+                .Returns(false);
+            
+            var commandParameterResolver = new CommandParameterResolver(readableWrapperFactoryMock.Object, writableWrapperFactoryMock.Object, integerLiteralFactoryMock.Object);
+            
+            return new CommandParameterResolverTestContext(readableWrapperFactoryMock, writableWrapperFactoryMock, integerLiteralFactoryMock, commandParameterResolver);
         }
 
 
-        private class CommandParameterResolverTestContext
+        private class CommandParameterResolverTestContext(
+            Mock<IReadableWrapperFactory> readableWrapperFactoryMock,
+            Mock<IWritableWrapperFactory> writableWrapperFactoryMock,
+            Mock<IIntegerLiteralFactory> integerLiteralFactoryMock,
+            CommandParameterResolver resolver)
         {
-            public Mock<IReadableWrapperFactory> ReadableWrapperFactoryMock { get; set; }
-            public Mock<IWritableWrapperFactory> WritableWrapperFactoryMock { get; set; }
-            public Mock<IIntegerLiteralFactory> IntegerLiteralFactoryMock { get; set; }
+            public Mock<IReadableWrapperFactory> ReadableWrapperFactoryMock => readableWrapperFactoryMock;
+            public Mock<IWritableWrapperFactory> WritableWrapperFactoryMock => writableWrapperFactoryMock;
+            public Mock<IIntegerLiteralFactory> IntegerLiteralFactoryMock => integerLiteralFactoryMock;
 
-            public CommandParameterResolver CommandParameterResolver { get; set; }
+            public CommandParameterResolver CommandParameterResolver => resolver;
         }
     }
 }
