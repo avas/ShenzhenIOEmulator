@@ -6,7 +6,7 @@ namespace ShenzhenIO.Emulator.Implementation.IO;
 
 public class SimpleNetwork : ISimpleNetwork
 {
-    private readonly IList<ISimpleNetworkNode> _nodes = new List<ISimpleNetworkNode>();
+    private readonly IList<ISimpleNetworkNode> _nodes = [];
     
     public bool TryAddNode(ISimpleNetworkNode node, out string? errorDescription)
     {
